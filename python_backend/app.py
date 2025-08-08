@@ -40,6 +40,9 @@ KASUNGU_SEASONAL_PATTERNS = {
 
 # Load the model globally when the app starts
 try:
+    
+    logger.info(f"Attempting to load model from {MODEL_PATH}")
+
     model = joblib.load(MODEL_PATH)
     logger.info(f"Model loaded successfully from {MODEL_PATH}")
     logger.info(f"Model type: {type(model).__name__}")
@@ -252,6 +255,28 @@ def predict():
     except Exception as e:
         logger.error(f"Prediction error: {e}")
         return jsonify({"error": f"Error during prediction: {str(e)}"}), 500
+
+def zoyesa() :
+    # Get enhanced prediction
+    prediction = get_enhanced_prediction(7, 2024)
+    
+    # Apply reasonable bounds
+    prediction["tmin"] = max(-10, min(40, prediction["tmin"]))
+    prediction["tmax"] = max(prediction["tmin"], min(50, prediction["tmax"]))
+    prediction["rainfall"] = max(0, min(500, prediction["rainfall"]))
+    prediction["wind_speed"] = max(0, min(50, prediction["wind_speed"]))
+    prediction["humidity"] = max(0, min(100, prediction["humidity"]))
+
+    # Format response - SINGLE FORMAT ONLY
+    response_data = {
+        "tmin": round(prediction["tmin"], 2),
+        "tmax": round(prediction["tmax"], 2),
+        "rainfall": round(prediction["rainfall"], 2),
+        "wind_speed": round(prediction["wind_speed"], 2),
+        "humidity": round(prediction["humidity"], 2)
+    }
+
+    logger.info(f"Final prediction result: {response_data}")
 
 @app.route('/test-model', methods=['GET'])
 def test_model():
