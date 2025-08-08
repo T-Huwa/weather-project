@@ -1417,8 +1417,8 @@
 
           <div
             class="nav-button"
-            data-section="current-weather"
-            onclick="showSection('current-weather')"
+            data-section="currentWeather"
+            onclick="showSection('currentWeather')"
           >
             <div class="nav-button-icon">
               <i class="fas fa-thermometer-half"></i>
@@ -1583,11 +1583,6 @@
     </div>
 
     <script>
-      // Configuration
-      window.addEventListener("DOMContentLoaded", () => {
-        loadCurrentWeather(); // 👈 This loads current weather
-      });
-
       const API_BASE_URL = "https://weather-project-orjd.onrender.com/";
       const OPENWEATHER_API_KEY = "b51cb434e01487ae9e1803a8b9ef73d5";
       const KASUNGU_COORDS = {
@@ -2045,7 +2040,7 @@
         }
 
         // Load data for specific sections if needed
-        if (sectionId === "current-weather") {
+        if (sectionId === "weatherDetails") {
           loadCurrentWeather();
         } else if (sectionId === "forecast") {
           loadWeatherForecast();
@@ -2759,6 +2754,8 @@
       async function loadCurrentWeather() {
         const weatherDetails = document.getElementById("weatherDetails");
 
+        console.log("Loading current weather...");
+
         try {
           // Show loading state
           weatherDetails.innerHTML = `
@@ -2772,12 +2769,15 @@
             `https://api.openweathermap.org/data/2.5/weather?lat=${KASUNGU_COORDS.lat}&lon=${KASUNGU_COORDS.lon}&units=metric&appid=${OPENWEATHER_API_KEY}`
           );
 
+          //console.log("Current Weather: ", await response.json());
+
           if (!response.ok) {
             throw new Error("Weather API request failed");
           }
 
           const data = await response.json();
           currentWeatherData = data;
+          console.log(currentWeatherData);
           updateCurrentWeather(data);
         } catch (error) {
           console.error("Error fetching current weather:", error);
@@ -2935,6 +2935,7 @@
       }
 
       // Update current weather display
+      /*
       function updateCurrentWeather(data) {
         const location = `${data.name}, ${data.sys.country}`;
         const temp = `${Math.round(data.main.temp)}°C`;
@@ -3000,6 +3001,93 @@
                     <div class="weather-detail-label">Sunrise</div>
                 </div>
             `;
+      }
+*/
+
+      function updateCurrentWeather(data) {
+        console.log("Updating current weather... ");
+        const location = `${data.name}, ${data.sys.country}`;
+        const temp = `${Math.round(data.main.temp)}°C`;
+        const description = data.weather[0].description;
+        const iconCode = data.weather[0].icon;
+
+        // Update location, temperature, and description
+        document.getElementById("weatherLocation").textContent = location;
+        document.getElementById("weatherTemp").textContent = temp;
+        document.getElementById("weatherDesc").textContent =
+          description.charAt(0).toUpperCase() + description.slice(1);
+
+        // Set weather icon
+        const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+        document.getElementById("weatherIcon").innerHTML = `
+    <img src="${iconUrl}" alt="${description}" style="width: 80px; height: 80px;" />
+  `;
+
+        // Update weather details
+        const weatherDetails = document.getElementById("weatherDetails");
+        weatherDetails.innerHTML = `
+    <div class="weather-detail">
+      <div class="weather-detail-icon"><i class="fas fa-thermometer-half"></i></div>
+      <div class="weather-detail-value">${Math.round(
+        data.main.feels_like
+      )}°C</div>
+      <div class="weather-detail-label">Feels Like</div>
+    </div>
+    <div class="weather-detail">
+      <div class="weather-detail-icon"><i class="fas fa-tint"></i></div>
+      <div class="weather-detail-value">${data.main.humidity}%</div>
+      <div class="weather-detail-label">Humidity</div>
+    </div>
+    <div class="weather-detail">
+      <div class="weather-detail-icon"><i class="fas fa-wind"></i></div>
+      <div class="weather-detail-value">${Math.round(
+        data.wind.speed * 3.6
+      )} km/h</div>
+      <div class="weather-detail-label">Wind Speed</div>
+    </div>
+    <div class="weather-detail">
+      <div class="weather-detail-icon"><i class="fas fa-eye"></i></div>
+      <div class="weather-detail-value">${(data.visibility / 1000).toFixed(
+        1
+      )} km</div>
+      <div class="weather-detail-label">Visibility</div>
+    </div>
+    <div class="weather-detail">
+      <div class="weather-detail-icon"><i class="fas fa-compress-arrows-alt"></i></div>
+      <div class="weather-detail-value">${data.main.pressure} hPa</div>
+      <div class="weather-detail-label">Pressure</div>
+    </div>
+    <div class="weather-detail">
+      <div class="weather-detail-icon"><i class="fas fa-water"></i></div>
+      <div class="weather-detail-value">${data.main.sea_level || "—"} hPa</div>
+      <div class="weather-detail-label">Sea Level</div>
+    </div>
+    <div class="weather-detail">
+      <div class="weather-detail-icon"><i class="fas fa-mountain"></i></div>
+      <div class="weather-detail-value">${data.main.grnd_level || "—"} hPa</div>
+      <div class="weather-detail-label">Ground Level</div>
+    </div>
+    <div class="weather-detail">
+      <div class="weather-detail-icon"><i class="fas fa-sun"></i></div>
+      <div class="weather-detail-value">${new Date(
+        data.sys.sunrise * 1000
+      ).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}</div>
+      <div class="weather-detail-label">Sunrise</div>
+    </div>
+    <div class="weather-detail">
+      <div class="weather-detail-icon"><i class="fas fa-moon"></i></div>
+      <div class="weather-detail-value">${new Date(
+        data.sys.sunset * 1000
+      ).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}</div>
+      <div class="weather-detail-label">Sunset</div>
+    </div>
+  `;
       }
 
       // Update 5-day weather forecast
