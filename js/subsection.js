@@ -9,7 +9,7 @@
 
   // Configuration
   const config = {
-    apiBaseUrl: "http://localhost:5000", // Update this for production
+    apiBaseUrl: "https://weather-project-orjd.onrender.com",
     endpoints: {
       subscribe: "/subscribe",
       subscriberCount: "/subscribers/count",
