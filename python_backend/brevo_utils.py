@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime
 import calendar
+import os
+from dotenv import load_dotenv
 
 # Import Brevo SDK
 import sib_api_v3_sdk
@@ -8,9 +10,10 @@ from sib_api_v3_sdk.rest import ApiException
 
 # Configure logging
 logger = logging.getLogger(__name__)
+load_dotenv()
 
 # Brevo API configuration
-BREVO_API_KEY = "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"
+BREVO_API_KEY = os.getenv('BREVO_API_KEY')
 
 # Email configuration
 SENDER_EMAIL = 'emmannyoni5@gmail.com'
