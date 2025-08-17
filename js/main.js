@@ -501,13 +501,15 @@ async function handlePredictionSubmit(e) {
       }),
     });
 
-    console.log("response: ", response.json());
+    const data = await response.json();
+
+    console.log("response: ", data);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const predictions = await response.json();
+    const predictions = data;
     currentPredictions = predictions;
 
     // Update results summary
